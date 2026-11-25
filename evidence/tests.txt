@@ -1,0 +1,122 @@
+Task test deno test -A --unstable-kv --unstable-cron
+Check tests/auth_test.ts
+Check tests/cache_test.ts
+Check tests/data_test.ts
+Check tests/health_test.ts
+Check tests/jobs_test.ts
+Check tests/jwt_test.ts
+Check tests/live_test.ts
+Check tests/logging_test.ts
+Check tests/migrations_test.ts
+Check tests/openapi_test.ts
+Check tests/ops_test.ts
+Check tests/pool_test.ts
+Check tests/ratelimit_test.ts
+Check tests/rbac_test.ts
+Check tests/regression_test.ts
+Check tests/softdelete_test.ts
+Check tests/summary_test.ts
+Check tests/tasks_test.ts
+Check tests/upload_test.ts
+running 9 tests from ./tests/auth_test.ts
+register answers 201 with id and email, never the hash ... ok (105ms)
+register lowercases the email, so a second sign-up with capitals is 409 ... ok (69ms)
+register with a bad body is 400 with the error shape ... ok (4ms)
+broken JSON is 400 in the same shape ... ok (3ms)
+register with no body at all is 400, not a crash ... ok (2ms)
+login with the right password returns a token ... ok (134ms)
+login with a wrong password and with an unknown email give the same 401 ... ok (260ms)
+a missing, malformed or unknown token is 401 with the error shape ... ok (3ms)
+an unknown email takes about as long as a wrong password (no timing leak) ... ok (267ms)
+running 4 tests from ./tests/cache_test.ts
+the second read is a cache hit: one miss, one hit ... ok (158ms)
+a changed task is not served stale (PUT and DELETE clear the entry) ... ok (138ms)
+the key includes the user: B never gets A's cached task ... ok (263ms)
+a miss for an unknown id is not cached ... ok (133ms)
+running 3 tests from ./tests/data_test.ts
+the list query uses the index from migrate() ... ok (9ms)
+seed fills an empty database, and a second run creates nothing ... ok (139ms)
+a seeded demo user can log in through the API and sees their tasks ... ok (142ms)
+running 1 test from ./tests/health_test.ts
+GET /health answers 200 and { ok: true } ... ok (15ms)
+running 2 tests from ./tests/jobs_test.ts
+purgeOldDone removes only done tasks completed more than 30 days ago, and is idempotent ... ok (13ms)
+purgeOldDone also removes the attachment files of the purged tasks ... ok (4ms)
+running 5 tests from ./tests/jwt_test.ts
+jwt mode: login returns a JWT, the routes work, and no session row is written ... ok (156ms)
+a tampered JWT is 401 ... ok (133ms)
+an expired JWT is 401 ... ok (132ms)
+a JWT signed with another secret is 401 ... ok (140ms)
+a session token is not accepted in jwt mode, and the reverse ... ok (266ms)
+running 5 tests from ./tests/live_test.ts
+GET /ws with a bad or missing token is 401, before any upgrade ... ok (18ms)
+GET /ws with a good token but no upgrade header is 426 ... ok (139ms)
+a change in one tab reaches my other tab, and never another user's ... ok (449ms)
+a closed tab is removed from the hub ... ok (136ms)
+LiveHub: only open sockets of that user receive the event ... ok (98µs)
+running 3 tests from ./tests/logging_test.ts
+every response has an x-request-id header, and error bodies carry the same id ... ok (16ms)
+one JSON line per request, with method, path, status, ms and the user id ... ok (147ms)
+no log line contains a password, a token, or a query string ... ok (135ms)
+running 1 test from ./tests/migrations_test.ts
+generated migrations upgrade existing rows and are safe to run twice ... ok (15ms)
+running 2 tests from ./tests/openapi_test.ts
+/openapi.json lists every route with its error responses and the Bearer scheme ... ok (21ms)
+/docs serves a Swagger UI page that loads /openapi.json ... ok (2ms)
+running 5 tests from ./tests/ops_test.ts
+GET /healthz is 200 and GET /readyz is 200 when the database answers ... ok (16ms)
+GET /readyz is 503 when the database does not answer ... ok (2ms)
+config: defaults for development ... ok (70µs)
+config: a bad value stops start-up with a clear message ... ok (735µs)
+config: production refuses the default or a short secret ... ok (330µs)
+running 5 tests from ./tests/pool_test.ts
+20 jobs on a pool of 3: never more than 3 at once, and all 20 finish ... ok (92ms)
+a job that throws still gives its connection back ... ok (262µs)
+waiters are served first come, first served ... ok (154µs)
+when every connection stays busy, acquire gives up after the timeout ... ok (32ms)
+a pool of real connections: concurrent writes all land, WAL is on ... ok (16ms)
+running 3 tests from ./tests/ratelimit_test.ts
+five failures, then the sixth try is 429 with Retry-After, even with the right password ... ok (606ms)
+a successful login clears the counter ... ok (83µs)
+the email is compared in lower case, so capitals do not get extra tries ... ok (131ms)
+running 2 tests from ./tests/rbac_test.ts
+RBAC (session): no token 401, normal user 403, operator-promoted admin 200 ... ok (283ms)
+RBAC (jwt): no token 401, normal user 403, operator-promoted admin 200 ... ok (265ms)
+running 5 tests from ./tests/regression_test.ts
+concurrent duplicate registration returns 201 and 409, never 500 ... ok (150ms)
+purging an old task invalidates its cached response ... ok (139ms)
+an in-flight stale cache load cannot overwrite a concurrent invalidation ... ok (137ms)
+healthz stays available while every database connection is held ... ok (25ms)
+OpenAPI describes multipart upload and all operational endpoints ... ok (8ms)
+running 5 tests from ./tests/softdelete_test.ts
+a deleted task is not listed and not found, but the row is still there ... ok (156ms)
+restore brings a deleted task back; restoring a live task is 404 ... ok (135ms)
+another user cannot restore my deleted task ... ok (267ms)
+register creates the user and the welcome task together ... ok (145ms)
+when the welcome task fails, the user is rolled back too ... ok (71ms)
+running 3 tests from ./tests/summary_test.ts
+GET /api/me/summary counts my tasks per status (deleted ones not counted) ... ok (291ms)
+N+1: the naive user list sends 1 + N queries, the join sends 1 ... ok (16ms)
+summary: the naive version sends 4 queries and loads every row, GROUP BY sends 1 ... ok (4ms)
+running 11 tests from ./tests/tasks_test.ts
+create a task: 201 with defaults, then it is in the list ... ok (153ms)
+read, update and delete my own task ... ok (139ms)
+PUT applies required defaults and keeps optional extra fields ... ok (134ms)
+user B cannot read, change or delete user A's task (404 each) ... ok (261ms)
+an invalid status or a missing title is 400 with the issues ... ok (132ms)
+a title over 100 characters and a bad due date are 400 ... ok (132ms)
+an id that is not a number is 400, an unknown id is 404 ... ok (131ms)
+pagination: 3 tasks, page 2 with limit=2 holds one item and total 3 ... ok (134ms)
+filter by status, and the defaults page=1 limit=20 ... ok (133ms)
+bad query values are 400, not a crash ... ok (133ms)
+an unknown route answers 404 in the same shape ... ok (2ms)
+running 6 tests from ./tests/upload_test.ts
+upload a PNG, then download the same bytes with the right content-type ... ok (159ms)
+no file is 400 ... ok (139ms)
+a file over 1 MB is 413 ... ok (144ms)
+a GIF is 415, and so is a text file that claims to be a PNG ... ok (140ms)
+another user can neither upload to nor download my attachment (404) ... ok (277ms)
+a task without an attachment answers 404 on download ... ok (133ms)
+
+ok | 80 passed | 0 failed (11s)
+

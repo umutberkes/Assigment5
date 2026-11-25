@@ -1,0 +1,7 @@
+Verified 25 November 2026 in Safari after GitHub sign-in to console.deno.com.
+Page title: New signups are closed | Deploy
+Visible heading: New signups are closed
+Visible explanation: "We are no longer taking on new customers, so it is not possible to create a new organization. Existing organizations keep running until the shutdown."
+Existing organizations may invite members; no existing organization was available for this account.
+Official announcement: https://deno.com/blog/cloudflare
+No deployment URL exists for this assignment. Bonus 19 is not claimed as complete.

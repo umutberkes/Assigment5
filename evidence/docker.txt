@@ -1,0 +1,210 @@
+GitHub Actions: https://github.com/umutberkes/Assigment5/actions/runs/45613836958
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 951B done
+#1 DONE 0.0s
+
+#2 [auth] denoland/deno:pull token for registry-1.docker.io
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/denoland/deno:2.9.7
+#3 DONE 0.5s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 112B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 106.04kB done
+#5 DONE 0.0s
+
+#6 [1/8] FROM docker.io/denoland/deno:2.9.7@sha256:fa335acdf6b72106eda2cb6a8cb5f4187e7630e357467489db4b2e7352d5e432
+#6 resolve docker.io/denoland/deno:2.9.7@sha256:fa335acdf6b72106eda2cb6a8cb5f4187e7630e357467489db4b2e7352d5e432 0.0s done
+#6 sha256:427f2d47b741a67d7d55f6af63e53e15f853f5d8c48f0b9b7f57a746aecdc66d 451B / 451B 0.0s done
+#6 sha256:e39f54c56ff3cd214428b95231ee72447fdbb3c585ef37d7d952bd27ce11b744 455B / 455B 0.0s done
+#6 sha256:316be950bb8f7e9764ae1b80f7a537942eed8306a51ff101210dc09f16baf7f4 9.46kB / 9.46kB 0.1s done
+#6 sha256:c28113bfb6a92d7d2c04a3cd1752c23d8cb92de8148a22471c26590b3c1bbae3 1.21kB / 1.21kB 0.0s done
+#6 sha256:8a889f1d5cd719f55b7d34719345dd5d19fc414bbc50933bcceafa22103497a6 18.87MB / 42.73MB 0.2s
+#6 sha256:8a889f1d5cd719f55b7d34719345dd5d19fc414bbc50933bcceafa22103497a6 42.73MB / 42.73MB 0.3s
+#6 sha256:6944fe143f65e1b0cbfacb93acfee7efb5b3075101dcd9f034eb174603681aec 8.39MB / 29.79MB 0.2s
+#6 sha256:6944fe143f65e1b0cbfacb93acfee7efb5b3075101dcd9f034eb174603681aec 29.79MB / 29.79MB 0.3s
+#6 sha256:8a889f1d5cd719f55b7d34719345dd5d19fc414bbc50933bcceafa22103497a6 42.73MB / 42.73MB 0.6s done
+#6 sha256:6944fe143f65e1b0cbfacb93acfee7efb5b3075101dcd9f034eb174603681aec 29.79MB / 29.79MB 0.6s done
+#6 extracting sha256:6944fe143f65e1b0cbfacb93acfee7efb5b3075101dcd9f034eb174603681aec
+#6 extracting sha256:6944fe143f65e1b0cbfacb93acfee7efb5b3075101dcd9f034eb174603681aec 0.5s done
+#6 DONE 1.2s
+
+#6 [1/8] FROM docker.io/denoland/deno:2.9.7@sha256:fa335acdf6b72106eda2cb6a8cb5f4187e7630e357467489db4b2e7352d5e432
+#6 extracting sha256:c28113bfb6a92d7d2c04a3cd1752c23d8cb92de8148a22471c26590b3c1bbae3 done
+#6 extracting sha256:8a889f1d5cd719f55b7d34719345dd5d19fc414bbc50933bcceafa22103497a6
+#6 extracting sha256:8a889f1d5cd719f55b7d34719345dd5d19fc414bbc50933bcceafa22103497a6 0.5s done
+#6 DONE 1.8s
+
+#6 [1/8] FROM docker.io/denoland/deno:2.9.7@sha256:fa335acdf6b72106eda2cb6a8cb5f4187e7630e357467489db4b2e7352d5e432
+#6 extracting sha256:316be950bb8f7e9764ae1b80f7a537942eed8306a51ff101210dc09f16baf7f4 done
+#6 extracting sha256:e39f54c56ff3cd214428b95231ee72447fdbb3c585ef37d7d952bd27ce11b744 done
+#6 extracting sha256:427f2d47b741a67d7d55f6af63e53e15f853f5d8c48f0b9b7f57a746aecdc66d done
+#6 DONE 1.8s
+
+#7 [2/8] WORKDIR /app
+#7 DONE 1.2s
+
+#8 [3/8] COPY deno.json deno.lock* ./
+#8 DONE 0.0s
+
+#9 [4/8] RUN deno install
+#9 0.161 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19_meta.json
+#9 0.255 [0m[32mDownload[0m https://jsr.io/@std/assert/meta.json
+#9 0.255 [0m[32mDownload[0m https://registry.npmjs.org/zod
+#9 0.255 [0m[32mDownload[0m https://registry.npmjs.org/jose
+#9 0.255 [0m[32mDownload[0m https://registry.npmjs.org/hono
+#9 0.255 [0m[32mDownload[0m https://registry.npmjs.org/drizzle-orm
+#9 0.255 [0m[32mDownload[0m https://registry.npmjs.org/drizzle-kit
+#9 0.255 [0m[32mDownload[0m https://registry.npmjs.org/bcryptjs
+#9 0.255 [0m[32mDownload[0m https://registry.npmjs.org/@libsql%2fclient
+#9 0.255 [0m[32mDownload[0m https://registry.npmjs.org/@hono%2fzod-openapi
+#9 0.324 [0m[32mDownload[0m https://jsr.io/@std/internal/meta.json
+#9 0.663 [0m[32mDownload[0m https://jsr.io/@std/internal/1.0.14_meta.json
+#9 0.676 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/mod.ts
+#9 0.676 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/assert.ts
+#9 0.676 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/almost_equals.ts
+#9 0.676 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/array_includes.ts
+#9 0.676 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/equals.ts
+#9 0.676 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/unstable_equals.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/exists.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/false.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/greater.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/greater_or_equal.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/instance_of.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/is_error.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/less.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/less_or_equal.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/match.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/unstable_never.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/not_equals.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/not_instance_of.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/not_match.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/not_strict_equals.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/object_match.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/rejects.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/strict_equals.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/unstable_strict_equals.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/string_includes.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/throws.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/assertion_error.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/equal.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/fail.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/unimplemented.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/unreachable.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/internal/1.0.14/format.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/internal/1.0.14/build_message.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/internal/1.0.14/diff.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/internal/1.0.14/diff_str.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/internal/1.0.14/truncate_build_message.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/internal/1.0.14/styles.ts
+#9 0.677 [0m[32mDownload[0m https://jsr.io/@std/internal/1.0.14/types.ts
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/drizzle-orm/-/drizzle-orm-0.44.7.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/jose/-/jose-6.2.18.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/zod/-/zod-4.6.7.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/hono/-/hono-4.13.18.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/drizzle-kit/-/drizzle-kit-0.31.11.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/@hono/zod-openapi/-/zod-openapi-1.6.3.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/bcryptjs/-/bcryptjs-3.0.3.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/@libsql/client/-/client-0.15.15.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/esbuild/-/esbuild-0.25.12.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/tsx/-/tsx-4.23.15.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/@esbuild-kit/esm-loader/-/esm-loader-2.6.5.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/@drizzle-team/brocli/-/brocli-0.10.2.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/openapi3-ts/-/openapi3-ts-4.6.2.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/@hono/zod-validator/-/zod-validator-0.9.1.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/@asteasolutions/zod-to-openapi/-/zod-to-openapi-9.1.0.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/@libsql/hrana-client/-/hrana-client-0.7.0.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/js-base64/-/js-base64-3.9.6.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/libsql/-/libsql-0.5.29.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/@libsql/core/-/core-0.15.15.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/promise-limit/-/promise-limit-2.7.0.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.25.12.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/esbuild/-/esbuild-0.28.2.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/get-tsconfig/-/get-tsconfig-4.14.3.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/@esbuild-kit/core-utils/-/core-utils-3.3.2.tgz
+#9 0.707 [0m[32mDownload[0m https://registry.npmjs.org/yaml/-/yaml-2.9.1.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/@libsql/isomorphic-fetch/-/isomorphic-fetch-0.3.1.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/node-fetch/-/node-fetch-3.3.2.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/@libsql/isomorphic-ws/-/isomorphic-ws-0.1.5.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/@libsql/linux-x64-musl/-/linux-x64-musl-0.5.29.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/@libsql/linux-x64-gnu/-/linux-x64-gnu-0.5.29.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/detect-libc/-/detect-libc-2.0.2.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/@neon-rs/load/-/load-0.0.4.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.28.2.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/resolve-pkg-maps/-/resolve-pkg-maps-1.0.0.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/esbuild/-/esbuild-0.18.20.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/source-map-support/-/source-map-support-0.5.21.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/fetch-blob/-/fetch-blob-3.2.0.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/data-uri-to-buffer/-/data-uri-to-buffer-4.0.1.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/formdata-polyfill/-/formdata-polyfill-4.0.10.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/ws/-/ws-8.23.0.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/@types/ws/-/ws-8.18.2.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.18.20.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/buffer-from/-/buffer-from-1.1.2.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/node-domexception/-/node-domexception-1.0.0.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/web-streams-polyfill/-/web-streams-polyfill-3.3.3.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/@types/node/-/node-26.6.6.tgz
+#9 0.708 [0m[32mDownload[0m https://registry.npmjs.org/undici-types/-/undici-types-8.9.0.tgz
+#9 0.907 [0m[38;5;245mInstalled[0m 2 [0m[38;5;245mpackages[0m [0m[38;5;245min[0m 761ms
+#9 0.907 [0m[38;5;245mReused[0m 0 [0m[38;5;245mpackages from cache[0m
+#9 0.907 [0m[38;5;245mDownloaded[0m 2 [0m[38;5;245mpackages from JSR[0m
+#9 0.907 [0m[32m++[0m
+#9 0.907 [0m[38;5;245mDownloaded[0m 48 [0m[38;5;245mpackages from npm[0m
+#9 0.907 [0m[32m++++++++++++++++++++++++++++++++++++++++++++++++[0m
+#9 0.907 
+#9 0.907 [0m[36mDependencies:[0m
+#9 0.907 [0m[32m+[0m [0m[38;5;245mjsr:[0m@std/assert [0m[38;5;245m1.0.19[0m
+#9 0.907 [0m[32m+[0m [0m[38;5;245mjsr:[0m@std/internal [0m[38;5;245m1.0.14[0m
+#9 0.907 [0m[32m+[0m [0m[38;5;245mnpm:[0m@hono/zod-openapi [0m[38;5;245m1.6.3[0m
+#9 0.907 [0m[32m+[0m [0m[38;5;245mnpm:[0m@libsql/client [0m[38;5;245m0.15.15[0m
+#9 0.907 [0m[32m+[0m [0m[38;5;245mnpm:[0mbcryptjs [0m[38;5;245m3.0.3[0m
+#9 0.907 [0m[32m+[0m [0m[38;5;245mnpm:[0mdrizzle-kit [0m[38;5;245m0.31.11[0m
+#9 0.907 [0m[32m+[0m [0m[38;5;245mnpm:[0mdrizzle-orm [0m[38;5;245m0.44.7[0m
+#9 0.907 [0m[32m+[0m [0m[38;5;245mnpm:[0mhono [0m[38;5;245m4.13.18[0m
+#9 0.907 [0m[32m+[0m [0m[38;5;245mnpm:[0mjose [0m[38;5;245m6.2.18[0m
+#9 0.907 [0m[32m+[0m [0m[38;5;245mnpm:[0mzod [0m[38;5;245m4.6.7[0m
+#9 0.907 
+#9 DONE 1.7s
+
+#10 [5/8] COPY src ./src
+#10 DONE 0.0s
+
+#11 [6/8] COPY drizzle ./drizzle
+#11 DONE 0.0s
+
+#12 [7/8] RUN deno cache src/main.ts
+#12 0.150 [0m[32mDownload[0m https://registry.npmjs.org/drizzle-orm
+#12 DONE 0.2s
+
+#13 [8/8] RUN mkdir /data && chown deno:deno /data
+#13 DONE 0.2s
+
+#14 exporting to image
+#14 exporting layers
+#14 exporting layers 3.7s done
+#14 exporting manifest sha256:3f088aa603110bb0dd9fec3d2e0c81b3de35e033b54908d39433ae03b9ba509d 0.0s done
+#14 exporting config sha256:a679819dc68fada3062dae2243aa8fcacef9745f89d56ccf4340b0424fbe25c2 done
+#14 exporting attestation manifest sha256:5c1cba3449ad2523fafa6549184cb24d6082af26683e6291b43338926a1c7848 done
+#14 exporting manifest list sha256:2b2831ea8c7be1df7f8b874345672ad62f47de59754538256943081489e250f3 done
+#14 naming to docker.io/library/assignment5-smoke:latest done
+#14 unpacking to docker.io/library/assignment5-smoke:latest
+#14 unpacking to docker.io/library/assignment5-smoke:latest 0.9s done
+#14 DONE 4.7s
+curl: (56) Recv failure: Connection reset by peer
+
+Container user: 1993
+POST /auth/register: {"id":1,"email":"persist@example.com","role":"user","createdAt":1795609632}
+HTTP 201
+curl: (56) Recv failure: Connection reset by peer
+Same registration after replacing container, reusing volume: {"error":"email already registered","requestId":"12d37a9a-7cbe-4240-8d1a-f069936735ba"}
+HTTP 409
+GET /health: {"ok":true}
+Image bytes: 102515159
+Docker persistence check passed.

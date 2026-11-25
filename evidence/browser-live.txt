@@ -1,0 +1,6 @@
+25 November 2026 — actual browser verification
+Both tabs at http://127.0.0.1:5173/; same isolated demo account.
+1. Register in tab A and log in in tab B.
+2. Add "Live verification: tab A to tab B" in A. It appeared in B without reload.
+3. Click todo in A. Both tabs displayed in-progress. Screenshots saved.
+4. Delete the task in A. It disappeared from B without reload.

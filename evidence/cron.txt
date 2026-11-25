@@ -1,0 +1,6 @@
+Local isolated database; CRON_SCHEDULE="* * * * *".
+Real Deno.cron invocations (not direct function calls):
+{"time":"2026-11-25T12:27:00.010Z","job":"purge","removed":1}
+{"time":"2026-11-25T12:28:00.006Z","job":"purge","removed":0}
+GET previously cached task after purge: HTTP 404.
+Production/default schedule remains 0 3 * * *.

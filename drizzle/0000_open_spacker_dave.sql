@@ -1,3 +1,4 @@
+-- Umut Berke Şenyayla, 2000002240
 CREATE TABLE `sessions` (
 	`token` text PRIMARY KEY NOT NULL,
 	`user_id` integer NOT NULL,

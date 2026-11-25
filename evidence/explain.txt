@@ -1,0 +1,20 @@
+Task explain deno run -A scripts/explain.ts
+20000 tasks for 20 users; identical data in every scenario
+
+1. no index: EXPLAIN QUERY PLAN
+  SCAN tasks
+  USE TEMP B-TREE FOR ORDER BY
+1. no index: 0.858 ms per query (average of 200)
+
+2. index on (user_id, status): EXPLAIN QUERY PLAN
+  SEARCH tasks USING INDEX idx_two (user_id=? AND status=?)
+  USE TEMP B-TREE FOR ORDER BY
+2. index on (user_id, status): 0.362 ms per query (average of 200)
+
+3. index on (user_id, status, created_at): EXPLAIN QUERY PLAN
+  SEARCH tasks USING INDEX idx_tasks_user_status_created (user_id=? AND status=?)
+3. index on (user_id, status, created_at): 0.217 ms per query (average of 200)
+
+size on disk:
+  idx_tasks_user_status_created: 430080 bytes
+  tasks: 1032192 bytes

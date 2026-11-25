@@ -1,0 +1,6 @@
+PORT=eighty AUTH_MODE=magic deno task start
+Exit status: 1
+Task start deno run -A --unstable-kv --unstable-cron src/main.ts
+invalid configuration:
+  PORT: Invalid input: expected number, received NaN
+  AUTH_MODE: Invalid option: expected one of "session"|"jwt"

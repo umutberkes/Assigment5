@@ -1,0 +1,9 @@
+Run 1: deno task seed
+seed: 3 users and 18 tasks created in file:/Users/umutberkesenyayla/Documents/Codex/2026-11-15/as/work/assignment5-build/seed-evidence.db
+log in as alice@example.com, bob@example.com or admin@example.com
+with the password demo-password-2026
+
+Run 2: deno task seed
+seed: 0 users and 0 tasks created in file:/Users/umutberkesenyayla/Documents/Codex/2026-11-15/as/work/assignment5-build/seed-evidence.db
+log in as alice@example.com, bob@example.com or admin@example.com
+with the password demo-password-2026

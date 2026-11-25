@@ -7,7 +7,7 @@ import { tasks, users } from "../src/schema.ts";
 
 const NOW = 1_800_000_000; // a fixed "now", so the test does not depend on the clock
 
-Deno.test("purgeOldDone removes only done tasks completed 30+ days ago, and is idempotent", async () => {
+Deno.test("purgeOldDone removes only done tasks completed more than 30 days ago, and is idempotent", async () => {
   const db = createDb(`file:${await Deno.makeTempFile({ suffix: ".db" })}`);
   await migrate(db);
   await db.db.insert(users).values({ email: "a@example.com", passwordHash: "x" });
@@ -22,12 +22,17 @@ Deno.test("purgeOldDone removes only done tasks completed 30+ days ago, and is i
 
   const first = await purgeOldDone(db, 30, { now: NOW });
   const second = await purgeOldDone(db, 30, { now: NOW });
-  assertEquals([first, second], [2, 0]);
+  assertEquals([first, second], [1, 0]);
 
   const left = (await db.db.select({ title: tasks.title }).from(tasks)).map((t) =>
     t.title
   );
-  assertEquals(left.sort(), ["old but not done", "old, reopened", "recent done"]);
+  assertEquals(left.sort(), [
+    "exactly 30 days",
+    "old but not done",
+    "old, reopened",
+    "recent done",
+  ]);
 });
 
 Deno.test("purgeOldDone also removes the attachment files of the purged tasks", async () => {

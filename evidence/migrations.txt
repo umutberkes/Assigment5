@@ -1,0 +1,4 @@
+Task db:migrate deno run -A npm:drizzle-kit@^0.31 migrate
+No config path provided, using default 'drizzle.config.ts'
+Reading config file '/Users/umutberkesenyayla/Documents/Codex/2026-11-15/as/outputs/assignment5/drizzle.config.ts'
+[⣷] applying migrations...[2K[1G[✓] migrations applied successfully!
