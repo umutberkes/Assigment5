@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 3: the summary numbers, and how many queries each version sends.
 import { assertEquals } from "@std/assert";
 import type { Logger } from "drizzle-orm";

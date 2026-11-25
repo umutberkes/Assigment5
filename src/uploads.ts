@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 12: checks for an uploaded image.
 
 export const MAX_UPLOAD_BYTES = 1_000_000;

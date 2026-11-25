@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 13: push task changes to the open browser tabs of the same user.
 import type { Task } from "./schema.ts";
 

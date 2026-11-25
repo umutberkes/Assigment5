@@ -1,9 +1,16 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 2: soft delete, restore and the registration transaction.
 import { assertEquals } from "@std/assert";
 import { count } from "drizzle-orm";
 import { tasks, users } from "../src/schema.ts";
-import { freshApp, freshContext, loginAs, makeTask, send, WELCOME_TASKS } from "./helpers.ts";
+import {
+  freshApp,
+  freshContext,
+  loginAs,
+  makeTask,
+  send,
+  WELCOME_TASKS,
+} from "./helpers.ts";
 
 Deno.test("a deleted task is not listed and not found, but the row is still there", async () => {
   const { app, pool } = await freshContext();
@@ -27,7 +34,13 @@ Deno.test("restore brings a deleted task back; restoring a live task is 404", as
   const token = await loginAs(app, "alice@example.com");
   const task = await makeTask(app, token, { title: "Water the plants" });
 
-  const early = await send(app, "POST", `/api/tasks/${task.id}/restore`, undefined, token);
+  const early = await send(
+    app,
+    "POST",
+    `/api/tasks/${task.id}/restore`,
+    undefined,
+    token,
+  );
   assertEquals(early.status, 404);
 
   await send(app, "DELETE", `/api/tasks/${task.id}`, undefined, token);

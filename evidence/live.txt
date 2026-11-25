@@ -1,0 +1,7 @@
+Task evidence:live deno run -A --unstable-kv scripts/verify_live.ts
+Actual HTTP server + three actual WebSocket connections
+Invalid token: HTTP 401 before upgrade
+Alice connection 1: ["created","updated","deleted"]
+Alice connection 2: ["created","updated","deleted"]
+Bob connection: []
+PASS: both same-user clients updated; another user received nothing.

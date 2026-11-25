@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 import { assert, assertEquals, assertExists } from "@std/assert";
 import { freshApp, send } from "./helpers.ts";
 
@@ -29,7 +29,10 @@ Deno.test("register lowercases the email, so a second sign-up with capitals is 4
 
 Deno.test("register with a bad body is 400 with the error shape", async () => {
   const app = await freshApp();
-  const res = await send(app, "POST", "/auth/register", { email: "nope", password: "short" });
+  const res = await send(app, "POST", "/auth/register", {
+    email: "nope",
+    password: "short",
+  });
   assertEquals(res.status, 400);
   const body = await res.json();
   assertEquals(body.error, "validation failed");
@@ -97,7 +100,10 @@ Deno.test("a missing, malformed or unknown token is 401 with the error shape", a
 Deno.test("an unknown email takes about as long as a wrong password (no timing leak)", async () => {
   const app = await freshApp();
   await send(app, "POST", "/auth/register", alice);
-  await send(app, "POST", "/auth/login", { email: "warm@example.com", password: "x".repeat(8) });
+  await send(app, "POST", "/auth/login", {
+    email: "warm@example.com",
+    password: "x".repeat(8),
+  });
   const time = async (email: string) => {
     const start = performance.now();
     await send(app, "POST", "/auth/login", { email, password: "wrong-password" });
@@ -106,5 +112,8 @@ Deno.test("an unknown email takes about as long as a wrong password (no timing l
   const known = await time(alice.email);
   const unknown = await time("nobody@example.com");
   // both run one bcrypt compare (tens of ms); without the dummy hash, unknown took ~2 ms
-  assert(unknown > known / 3, `known ${known.toFixed(1)} ms, unknown ${unknown.toFixed(1)} ms`);
+  assert(
+    unknown > known / 3,
+    `known ${known.toFixed(1)} ms, unknown ${unknown.toFixed(1)} ms`,
+  );
 });

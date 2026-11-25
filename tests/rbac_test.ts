@@ -1,49 +1,43 @@
-// STUDENT NAME, STUDENT NUMBER
-// Bonus 9: an admin role and an admin-only route.
+// Umut Berke Şenyayla, 2000002240
 import { assertEquals } from "@std/assert";
-import { freshApp, loginAs, send } from "./helpers.ts";
+import { eq } from "drizzle-orm";
+import { users } from "../src/schema.ts";
+import { freshContext, loginAs, PASSWORD, send } from "./helpers.ts";
 
-const ADMIN = "hoca@example.com";
-
-Deno.test("GET /api/admin/users: no token is 401", async () => {
-  const app = await freshApp({ config: { ADMIN_EMAIL: ADMIN } });
-  const res = await send(app, "GET", "/api/admin/users");
-  assertEquals(res.status, 401);
-  assertEquals((await res.json()).error, "unauthorized");
-});
-
-Deno.test("GET /api/admin/users: a normal user is 403", async () => {
-  const app = await freshApp({ config: { ADMIN_EMAIL: ADMIN } });
-  const token = await loginAs(app, "alice@example.com");
-  const res = await send(app, "GET", "/api/admin/users", undefined, token);
-  assertEquals(res.status, 403);
-  assertEquals((await res.json()).error, "forbidden");
-});
-
-Deno.test("GET /api/admin/users: the admin gets every user with a task count", async () => {
-  const app = await freshApp({ config: { ADMIN_EMAIL: ADMIN } });
-  await loginAs(app, "alice@example.com");
-  const admin = await loginAs(app, "Hoca@Example.com"); // emails are compared in lower case
-  const res = await send(app, "GET", "/api/admin/users", undefined, admin);
-  assertEquals(res.status, 200);
-  const list = await res.json();
-  assertEquals(
-    list.map((u: { email: string; role: string; tasks: number }) => [u.email, u.role, u.tasks]),
-    [["alice@example.com", "user", 1], [ADMIN, "admin", 1]],
-  );
-  assertEquals("passwordHash" in list[0], false);
-});
-
-Deno.test("works the same with JWT: the role comes from the claim", async () => {
-  const app = await freshApp({
-    config: {
-      ADMIN_EMAIL: ADMIN,
-      AUTH_MODE: "jwt",
-      JWT_SECRET: "test-secret-that-is-long-enough-1234567890",
-    },
+for (const mode of ["session", "jwt"] as const) {
+  Deno.test(`RBAC (${mode}): no token 401, normal user 403, operator-promoted admin 200`, async () => {
+    const { app, pool } = await freshContext({ config: { AUTH_MODE: mode } });
+    assertEquals((await send(app, "GET", "/api/admin/users")).status, 401);
+    const ordinary = await loginAs(app, "alice@example.com");
+    assertEquals(
+      (await send(app, "GET", "/api/admin/users", undefined, ordinary)).status,
+      403,
+    );
+    const registration = await send(app, "POST", "/auth/register", {
+      email: "admin@example.com",
+      password: PASSWORD,
+      role: "admin",
+    });
+    assertEquals((await registration.json()).role, "user");
+    await pool.use(async (db) => {
+      await db.db.update(users).set({ role: "admin" }).where(
+        eq(users.email, "admin@example.com"),
+      );
+    });
+    const login = await send(app, "POST", "/auth/login", {
+      email: "admin@example.com",
+      password: PASSWORD,
+    });
+    const { token } = await login.json();
+    const response = await send(app, "GET", "/api/admin/users", undefined, token);
+    assertEquals(response.status, 200);
+    const list = await response.json();
+    assertEquals(
+      list.map((
+        u: { email: string; role: string; tasks: number },
+      ) => [u.email, u.role, u.tasks]),
+      [["alice@example.com", "user", 1], ["admin@example.com", "admin", 1]],
+    );
+    assertEquals("passwordHash" in list[0], false);
   });
-  const user = await loginAs(app, "alice@example.com");
-  const admin = await loginAs(app, ADMIN);
-  assertEquals((await send(app, "GET", "/api/admin/users", undefined, user)).status, 403);
-  assertEquals((await send(app, "GET", "/api/admin/users", undefined, admin)).status, 200);
-});
+}

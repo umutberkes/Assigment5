@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 import { assertEquals } from "@std/assert";
 import { freshApp, loginAs, makeTask, send, WELCOME_TASKS } from "./helpers.ts";
 
@@ -8,7 +8,11 @@ Deno.test("create a task: 201 with defaults, then it is in the list", async () =
   const res = await send(app, "POST", "/api/tasks", { title: "Buy a ferry card" }, token);
   assertEquals(res.status, 201);
   const task = await res.json();
-  assertEquals([task.title, task.status, task.priority], ["Buy a ferry card", "todo", "medium"]);
+  assertEquals([task.title, task.status, task.priority], [
+    "Buy a ferry card",
+    "todo",
+    "medium",
+  ]);
   assertEquals(typeof task.createdAt, "number");
 
   const list = await (await send(app, "GET", "/api/tasks", undefined, token)).json();
@@ -47,7 +51,7 @@ Deno.test("read, update and delete my own task", async () => {
   assertEquals(gone.status, 404);
 });
 
-Deno.test("PUT keeps the fields it was not given (as the given UI sends only title and status)", async () => {
+Deno.test("PUT applies required defaults and keeps optional extra fields", async () => {
   const app = await freshApp();
   const token = await loginAs(app, "alice@example.com");
   const task = await makeTask(app, token, {
@@ -63,7 +67,7 @@ Deno.test("PUT keeps the fields it was not given (as the given UI sends only tit
   const t = await res.json();
   assertEquals([t.status, t.priority, t.notes, t.dueDate], [
     "in-progress",
-    "high",
+    "medium",
     "room B204",
     "2027-01-12",
   ]);
@@ -72,7 +76,7 @@ Deno.test("PUT keeps the fields it was not given (as the given UI sends only tit
     title: "Exam",
     notes: null,
   }, token)).json();
-  assertEquals([cleared.notes, cleared.status], [null, "in-progress"]);
+  assertEquals([cleared.notes, cleared.status], [null, "todo"]);
 });
 
 Deno.test("user B cannot read, change or delete user A's task (404 each)", async () => {
@@ -93,7 +97,8 @@ Deno.test("user B cannot read, change or delete user A's task (404 each)", async
   assertEquals(list.total, WELCOME_TASKS);
   assertEquals(list.items.some((t: { id: number }) => t.id === task.id), false);
   // the task is unchanged for A
-  const mine = await (await send(app, "GET", `/api/tasks/${task.id}`, undefined, a)).json();
+  const mine = await (await send(app, "GET", `/api/tasks/${task.id}`, undefined, a))
+    .json();
   assertEquals(mine.title, "Alice's secret");
 });
 
@@ -153,7 +158,8 @@ Deno.test("filter by status, and the defaults page=1 limit=20", async () => {
   const token = await loginAs(app, "alice@example.com");
   await makeTask(app, token, { title: "a", status: "done" });
   await makeTask(app, token, { title: "b" });
-  const res = await (await send(app, "GET", "/api/tasks?status=done", undefined, token)).json();
+  const res = await (await send(app, "GET", "/api/tasks?status=done", undefined, token))
+    .json();
   assertEquals([res.page, res.limit, res.total, res.items[0].title], [1, 20, 1, "a"]);
 });
 

@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 import { drizzle } from "drizzle-orm/libsql";
 import { migrate as drizzleMigrate } from "drizzle-orm/libsql/migrator";
 import { createClient } from "@libsql/client";
@@ -64,6 +64,7 @@ export const CREATE_TABLES = [
      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
      title TEXT NOT NULL,
      notes TEXT,
+     estimate_minutes INTEGER,
      due_date TEXT,
      status TEXT NOT NULL DEFAULT 'todo',
      priority TEXT NOT NULL DEFAULT 'medium',
@@ -93,6 +94,12 @@ export async function migrate({ client }: Db) {
  */
 export async function migrateFromFolder({ db }: Db, migrationsFolder = "./drizzle") {
   await drizzleMigrate(db, { migrationsFolder });
+}
+
+/** Run generated migrations when available (also used by seed/admin scripts). */
+export async function migrateDatabase(db: Db) {
+  if (await hasGeneratedMigrations()) await migrateFromFolder(db);
+  else await migrate(db);
 }
 
 /** True when generated migrations exist; then main.ts uses them instead of CREATE_TABLES. */

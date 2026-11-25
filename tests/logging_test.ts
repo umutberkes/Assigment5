@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 10: one JSON log line per request, and a request id everywhere.
 import { assert, assertEquals, assertMatch } from "@std/assert";
 import { freshApp, PASSWORD, send } from "./helpers.ts";
@@ -23,7 +23,10 @@ Deno.test("every response has an x-request-id header, and error bodies carry the
 Deno.test("one JSON line per request, with method, path, status, ms and the user id", async () => {
   const lines: string[] = [];
   const app = await freshApp({ log: (l) => lines.push(l) });
-  await send(app, "POST", "/auth/register", { email: "alice@example.com", password: PASSWORD });
+  await send(app, "POST", "/auth/register", {
+    email: "alice@example.com",
+    password: PASSWORD,
+  });
   const login = await send(app, "POST", "/auth/login", {
     email: "alice@example.com",
     password: PASSWORD,
@@ -33,7 +36,12 @@ Deno.test("one JSON line per request, with method, path, status, ms and the user
 
   assertEquals(lines.length, 3);
   const last = JSON.parse(lines[2]!);
-  assertEquals([last.method, last.path, last.status, last.userId], ["GET", "/api/tasks", 200, 1]);
+  assertEquals([last.method, last.path, last.status, last.userId], [
+    "GET",
+    "/api/tasks",
+    200,
+    1,
+  ]);
   assertEquals(typeof last.ms, "number");
   assertMatch(last.requestId, UUID);
 });
@@ -41,7 +49,10 @@ Deno.test("one JSON line per request, with method, path, status, ms and the user
 Deno.test("no log line contains a password, a token, or a query string", async () => {
   const lines: string[] = [];
   const app = await freshApp({ log: (l) => lines.push(l) });
-  await send(app, "POST", "/auth/register", { email: "alice@example.com", password: PASSWORD });
+  await send(app, "POST", "/auth/register", {
+    email: "alice@example.com",
+    password: PASSWORD,
+  });
   const { token } = await (await send(app, "POST", "/auth/login", {
     email: "alice@example.com",
     password: PASSWORD,

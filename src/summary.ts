@@ -1,8 +1,8 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 3: counts per status, written the naive way and the good way.
 import { and, count, eq, isNull, sql } from "drizzle-orm";
 import type { Db } from "./db.ts";
-import { type Role, STATUSES, type Status, tasks, users } from "./schema.ts";
+import { type Role, type Status, STATUSES, tasks, users } from "./schema.ts";
 
 export type Summary = Record<Status, number> & { total: number };
 
@@ -34,7 +34,13 @@ export async function summaryGrouped(db: Db, userId: number): Promise<Summary> {
   return out;
 }
 
-export type UserRow = { id: number; email: string; role: Role; createdAt: number; tasks: number };
+export type UserRow = {
+  id: number;
+  email: string;
+  role: Role;
+  createdAt: number;
+  tasks: number;
+};
 
 /** The real N+1: one query for the users, then one query PER USER for the task count. */
 export async function usersWithCountsNaive(db: Db): Promise<UserRow[]> {

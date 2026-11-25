@@ -1,6 +1,6 @@
-# STUDENT NAME, STUDENT NUMBER
+# Umut Berke Şenyayla, 2000002240
 # Bonus 17: build with  docker build -t tasks-api .
-FROM denoland/deno:2.6.3
+FROM denoland/deno:2.9.7
 WORKDIR /app
 
 # 1. dependencies first: this layer is reused as long as deno.json and deno.lock do not change
@@ -9,6 +9,7 @@ RUN deno install
 
 # 2. then the source; a code change only rebuilds from here
 COPY src ./src
+COPY drizzle ./drizzle
 RUN deno cache src/main.ts
 
 # the database and the uploads live on a volume mounted at /data

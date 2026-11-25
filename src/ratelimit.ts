@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 15: after `max` failed logins for one email inside `windowMs`, refuse for a while.
 
 type Entry = { failures: number; resetAt: number };

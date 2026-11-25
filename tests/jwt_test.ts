@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 7: JWT instead of sessions (AUTH_MODE=jwt).
 import { assertEquals } from "@std/assert";
 import { count } from "drizzle-orm";
@@ -57,6 +57,12 @@ Deno.test("a session token is not accepted in jwt mode, and the reverse", async 
   const session = await freshContext();
   const sessionToken = await loginAs(session.app, "alice@example.com");
   const jwtToken = await loginAs(jwt.app, "alice@example.com");
-  assertEquals((await send(jwt.app, "GET", "/api/tasks", undefined, sessionToken)).status, 401);
-  assertEquals((await send(session.app, "GET", "/api/tasks", undefined, jwtToken)).status, 401);
+  assertEquals(
+    (await send(jwt.app, "GET", "/api/tasks", undefined, sessionToken)).status,
+    401,
+  );
+  assertEquals(
+    (await send(session.app, "GET", "/api/tasks", undefined, jwtToken)).status,
+    401,
+  );
 });

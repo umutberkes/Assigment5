@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 import { type AppDeps, createApp } from "../src/app.ts";
 import { type Config, testConfig } from "../src/config.ts";
 import { createDbPool, migrate } from "../src/db.ts";
@@ -16,7 +16,10 @@ export async function freshContext(overrides: Overrides = {}) {
   const file = await Deno.makeTempFile({ suffix: ".db" });
   const pool = await createDbPool(`file:${file}`, 2);
   await pool.use((db) => migrate(db));
-  const config = testConfig({ UPLOAD_DIR: await Deno.makeTempDir(), ...overrides.config });
+  const config = testConfig({
+    UPLOAD_DIR: await Deno.makeTempDir(),
+    ...overrides.config,
+  });
   const hub = overrides.hub ?? new LiveHub();
   const app = createApp({ log: null, ...overrides, pool, config, hub });
   return { app, pool, config, hub, file };
@@ -47,7 +50,11 @@ export async function send(
 export const PASSWORD = "kadikoy-1907";
 
 /** Register a user and log in; returns the token. */
-export async function loginAs(app: App, email: string, password = PASSWORD): Promise<string> {
+export async function loginAs(
+  app: App,
+  email: string,
+  password = PASSWORD,
+): Promise<string> {
   await send(app, "POST", "/auth/register", { email, password });
   const res = await send(app, "POST", "/auth/login", { email, password });
   if (res.status !== 200) throw new Error(`loginAs: ${res.status} ${await res.text()}`);

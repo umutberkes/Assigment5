@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // R5 and Bonus 8: every Zod schema in one place. The same schemas validate the requests and
 // describe the API in /openapi.json, so the docs cannot drift away from the code.
 import { z } from "@hono/zod-openapi";
@@ -15,19 +15,20 @@ export const TaskBody = z.object({
   status: z.enum(STATUSES).default("todo"),
   priority: z.enum(PRIORITIES).default("medium"),
   notes: z.string().max(2000).nullable().default(null),
+  estimateMinutes: z.number().int().min(0).max(100000).nullable().default(null),
   dueDate: z.iso.date().nullable().default(null).openapi({ example: "2026-12-01" }),
 }).openapi("TaskBody");
 
 /**
- * PUT has the same fields as POST, but a field that is left out keeps its current value
- * instead of falling back to the default. (The given UI sends only title and status when it
- * advances a task; with plain defaults that reset every task's priority to "medium".)
+ * PUT uses the required status/priority defaults, just like POST. Extra optional
+ * fields retain their previous values when absent; null explicitly clears them.
  */
 export const TaskUpdate = z.object({
   title: TaskBody.shape.title,
-  status: z.enum(STATUSES).optional(),
-  priority: z.enum(PRIORITIES).optional(),
+  status: z.enum(STATUSES).default("todo"),
+  priority: z.enum(PRIORITIES).default("medium"),
   notes: z.string().max(2000).nullable().optional(),
+  estimateMinutes: z.number().int().min(0).max(100000).nullable().optional(),
   dueDate: z.iso.date().nullable().optional(),
 }).openapi("TaskUpdate");
 
@@ -38,7 +39,10 @@ export const ListQuery = z.object({
 });
 
 export const IdParams = z.object({
-  id: z.coerce.number().int().positive().openapi({ param: { name: "id", in: "path" }, example: 1 }),
+  id: z.coerce.number().int().positive().openapi({
+    param: { name: "id", in: "path" },
+    example: 1,
+  }),
 });
 
 export const Task = z.object({
@@ -46,6 +50,7 @@ export const Task = z.object({
   userId: z.number().int(),
   title: z.string(),
   notes: z.string().nullable(),
+  estimateMinutes: z.number().int().nullable(),
   dueDate: z.string().nullable(),
   status: z.enum(STATUSES),
   priority: z.enum(PRIORITIES),
@@ -71,7 +76,9 @@ export const PublicUser = z.object({
   createdAt: z.number().int(),
 }).openapi("User");
 
-export const AdminUser = PublicUser.extend({ tasks: z.number().int() }).openapi("AdminUser");
+export const AdminUser = PublicUser.extend({ tasks: z.number().int() }).openapi(
+  "AdminUser",
+);
 
 export const Token = z.object({ token: z.string() }).openapi("Token");
 export const Ok = z.object({ ok: z.literal(true) }).openapi("Ok");
@@ -109,3 +116,10 @@ export const jsonBody = <T extends z.ZodType>(schema: T) => ({
 });
 
 export const Binary = z.string().openapi({ type: "string", format: "binary" });
+
+export const UploadBody = z.object({
+  file: z.instanceof(File).openapi({ type: "string", format: "binary" }),
+});
+
+export const Ready = z.object({ ready: z.boolean() });
+export const WebSocketQuery = z.object({ token: z.string().optional() });

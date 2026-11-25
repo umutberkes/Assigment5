@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 4: show the query plan and the time of the list query, without and with the index.
 //   deno task explain
 // It uses its own temporary database, so it never touches tasks.db.
@@ -29,7 +29,10 @@ for (let i = 0; i < TASKS; i += BATCH) {
 console.log(`${TASKS} tasks for ${USERS} users`);
 
 async function plan(label: string) {
-  const res = await db.client.execute({ sql: `EXPLAIN QUERY PLAN ${QUERY}`, args: [7, "done"] });
+  const res = await db.client.execute({
+    sql: `EXPLAIN QUERY PLAN ${QUERY}`,
+    args: [7, "done"],
+  });
   console.log(`\n${label}: EXPLAIN QUERY PLAN`);
   for (const row of res.rows) console.log(`  ${row.detail}`);
 }

@@ -1,3 +1,4 @@
+// Umut Berke Şenyayla, 2000002240
 // A small, ready-made UI to try your API. It is not graded and you do not have to change it.
 import { useCallback, useEffect, useState } from "react";
 
@@ -45,6 +46,17 @@ export default function App() {
     if (token) load(token);
   }, [token, load]);
 
+  useEffect(() => {
+    if (!token) return;
+    const url = new URL("/ws", location.href);
+    url.protocol = location.protocol === "https:" ? "wss:" : "ws:";
+    url.searchParams.set("token", token);
+    const socket = new WebSocket(url);
+    socket.onmessage = () => { void load(token); };
+    socket.onerror = () => setMessage("Live updates disconnected; refresh to reconnect.");
+    return () => socket.close();
+  }, [token, load]);
+
   async function auth(kind: "register" | "login") {
     setMessage("");
     try {
@@ -86,7 +98,7 @@ export default function App() {
     try {
       await call(`/api/tasks/${t.id}`, token, {
         method: "PUT",
-        body: JSON.stringify({ title: t.title, status: NEXT[t.status] }),
+        body: JSON.stringify({ title: t.title, status: NEXT[t.status], priority: t.priority }),
       });
       load(token);
     } catch (err) {

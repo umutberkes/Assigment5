@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 11: read the environment once, validate it, and stop with a clear message.
 import { z } from "zod";
 
@@ -6,18 +6,28 @@ export const DEV_SECRET = "dev-secret";
 
 const Env = z.object({
   APP_ENV: z.enum(["development", "test", "production"]).default("development"),
+  CRON_SCHEDULE: z.enum(["0 3 * * *", "* * * * *"]).default("0 3 * * *"),
   PORT: z.coerce.number().int().min(1).max(65535).default(8000),
-  DATABASE_URL: z.string().regex(/^(file:|libsql:|https?:)/, "must start with file:, libsql: or https:")
+  DATABASE_URL: z.string().regex(
+    /^(file:|libsql:|https?:)/,
+    "must start with file:, libsql: or https:",
+  )
     .default("file:./tasks.db"),
   DATABASE_AUTH_TOKEN: z.string().optional(),
   DB_POOL_SIZE: z.coerce.number().int().min(1).max(32).default(4),
   AUTH_MODE: z.enum(["session", "jwt"]).default("session"),
   JWT_SECRET: z.string().min(1).default(DEV_SECRET),
-  ADMIN_EMAIL: z.email().transform((e) => e.toLowerCase()).optional(),
   UPLOAD_DIR: z.string().min(1).default("./uploads"),
   LOG_REQUESTS: z.stringbool().default(true),
 }).superRefine((env, ctx) => {
   if (env.APP_ENV !== "production") return;
+  if (env.CRON_SCHEDULE !== "0 3 * * *") {
+    ctx.addIssue({
+      code: "custom",
+      path: ["CRON_SCHEDULE"],
+      message: "production uses the daily purge schedule",
+    });
+  }
   const weak = env.JWT_SECRET === DEV_SECRET || env.JWT_SECRET === "change-me" ||
     env.JWT_SECRET.length < 32;
   if (weak) {

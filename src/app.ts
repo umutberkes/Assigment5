@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import { bodyLimit } from "hono/body-limit";
@@ -22,12 +22,7 @@ import { LoginLimiter } from "./ratelimit.ts";
 import type { TaskCache } from "./cache.ts";
 import { type LiveEvent, LiveHub } from "./live.ts";
 import { summaryGrouped, usersWithCounts } from "./summary.ts";
-import {
-  extensionOf,
-  isAllowedType,
-  MAX_UPLOAD_BYTES,
-  sniffImage,
-} from "./uploads.ts";
+import { extensionOf, isAllowedType, MAX_UPLOAD_BYTES, sniffImage } from "./uploads.ts";
 import * as S from "./schemas.ts";
 
 export type AppDeps = {
@@ -77,6 +72,10 @@ export function createApp(deps: AppDeps) {
   // ---- middleware for every request ------------------------------------------------------
   app.use("*", requestLog(log)); // Bonus 10
   app.use("*", async (c, next) => { // Bonus 6: borrow one connection per request
+    if (["/health", "/healthz", "/docs", "/openapi.json"].includes(c.req.path)) {
+      await next();
+      return;
+    }
     await pool.use(async (db) => {
       c.set("db", db);
       await next();
@@ -85,7 +84,11 @@ export function createApp(deps: AppDeps) {
 
   const own = (id: number, userId: number) =>
     and(eq(tasks.id, id), eq(tasks.userId, userId), isNull(tasks.deletedAt));
-  const findOwn = async (db: Db, id: number, userId: number): Promise<Task | undefined> => {
+  const findOwn = async (
+    db: Db,
+    id: number,
+    userId: number,
+  ): Promise<Task | undefined> => {
     const [task] = await db.db.select().from(tasks).where(own(id, userId));
     return task;
   };
@@ -140,7 +143,7 @@ export function createApp(deps: AppDeps) {
       if (taken) return c.json(errorBody(c, "email already registered"), 409);
 
       const passwordHash = await hashPassword(password);
-      const role = config.ADMIN_EMAIL === email ? "admin" as const : "user" as const;
+      const role = "user" as const; // public registration never grants administrative access
       // Bonus 2: the user and the welcome task are saved together or not at all
       const user = await db.db.transaction(async (tx) => {
         const [created] = await tx.insert(users).values({ email, passwordHash, role })
@@ -188,7 +191,9 @@ export function createApp(deps: AppDeps) {
         return c.json(errorBody(c, "wrong email or password"), 401);
       }
       limiter.reset(email);
-      return c.json({ token: await tokens.issue(db, { userId: user.id, role: user.role }) }, 200);
+      return c.json({
+        token: await tokens.issue(db, { userId: user.id, role: user.role }),
+      }, 200);
     },
   );
 
@@ -297,7 +302,7 @@ export function createApp(deps: AppDeps) {
       const db = c.get("db");
       const old = await findOwn(db, id, userId);
       if (!old) return c.json(errorBody(c, "task not found"), 404);
-      const status = body.status ?? old.status;
+      const status = body.status;
       // keep the first completion time while a task stays done (Bonus 14 uses it)
       const completedAt = status !== "done"
         ? null
@@ -308,8 +313,11 @@ export function createApp(deps: AppDeps) {
         .set({
           title: body.title,
           status,
-          priority: body.priority ?? old.priority,
+          priority: body.priority,
           notes: body.notes === undefined ? old.notes : body.notes,
+          estimateMinutes: body.estimateMinutes === undefined
+            ? old.estimateMinutes
+            : body.estimateMinutes,
           dueDate: body.dueDate === undefined ? old.dueDate : body.dueDate,
           completedAt,
           updatedAt: now(),
@@ -368,7 +376,9 @@ export function createApp(deps: AppDeps) {
       const userId = c.get("userId");
       const [task] = await c.get("db").db.update(tasks)
         .set({ deletedAt: null })
-        .where(and(eq(tasks.id, id), eq(tasks.userId, userId), isNotNull(tasks.deletedAt)))
+        .where(
+          and(eq(tasks.id, id), eq(tasks.userId, userId), isNotNull(tasks.deletedAt)),
+        )
         .returning();
       if (!task) return c.json(errorBody(c, "no deleted task with this id"), 404);
       await changed(userId, "restored", task);
@@ -382,13 +392,20 @@ export function createApp(deps: AppDeps) {
       method: "post",
       path: "/api/tasks/{id}/attachment",
       tags: ["attachments"],
-      description: "multipart/form-data with one field `file`: a PNG or JPEG of at most 1 MB.",
+      description:
+        "multipart/form-data with one field `file`: a PNG or JPEG of at most 1 MB.",
       ...authed,
       middleware: [bodyLimit({
         maxSize: MAX_UPLOAD_BYTES + 64 * 1024, // the file plus the multipart framing
         onError: (c) => c.json(errorBody(c, "file too large (max 1 MB)"), 413),
       })] as const,
-      request: { params: S.IdParams },
+      request: {
+        params: S.IdParams,
+        body: {
+          required: true,
+          content: { "multipart/form-data": { schema: S.UploadBody } },
+        },
+      },
       responses: {
         200: S.jsonResponse(S.Task, "the task with its attachment"),
         400: S.errorResponse("no file in the form"),
@@ -405,7 +422,7 @@ export function createApp(deps: AppDeps) {
       const old = await findOwn(db, id, userId);
       if (!old) return c.json(errorBody(c, "task not found"), 404);
 
-      const form = await c.req.parseBody().catch(() => ({} as Record<string, unknown>));
+      const form = c.req.valid("form");
       const f = form["file"];
       if (!(f instanceof File)) return c.json(errorBody(c, "file required"), 400);
       if (f.size > MAX_UPLOAD_BYTES) {
@@ -459,7 +476,10 @@ export function createApp(deps: AppDeps) {
       const { id } = c.req.valid("param");
       const task = await findOwn(c.get("db"), id, c.get("userId"));
       if (!task?.attachment || !task.attachmentType) {
-        return c.json(errorBody(c, task ? "this task has no attachment" : "task not found"), 404);
+        return c.json(
+          errorBody(c, task ? "this task has no attachment" : "task not found"),
+          404,
+        );
       }
       const bytes = await Deno.readFile(`${config.UPLOAD_DIR}/${task.attachment}`);
       return c.body(bytes, 200, {
@@ -506,12 +526,14 @@ export function createApp(deps: AppDeps) {
   app.get("/ws", async (c) => {
     // a browser cannot set headers on a WebSocket, so the token comes in the query string;
     // check it BEFORE the upgrade
-    const who = await tokens.verify(c.get("db"), c.req.query("token") ?? "");
+    const query = S.WebSocketQuery.parse(c.req.query());
+    const who = await tokens.verify(c.get("db"), query.token ?? "");
     if (!who) return c.json(errorBody(c, "unauthorized"), 401);
     if (c.req.header("upgrade")?.toLowerCase() !== "websocket") {
       return c.json(errorBody(c, "expected a WebSocket upgrade"), 426);
     }
-    const upgrade = deps.upgradeWebSocket ?? ((req: Request) => Deno.upgradeWebSocket(req));
+    const upgrade = deps.upgradeWebSocket ??
+      ((req: Request) => Deno.upgradeWebSocket(req));
     const { socket, response } = upgrade(c.req.raw);
     socket.onopen = () => hub.add(who.userId, socket);
     socket.onclose = () => hub.remove(who.userId, socket);
@@ -524,6 +546,38 @@ export function createApp(deps: AppDeps) {
     scheme: "bearer",
     bearerFormat: tokens.kind === "jwt" ? "JWT" : "opaque session token",
   });
+  for (const path of ["/healthz", "/readyz"]) {
+    app.openAPIRegistry.registerPath({
+      method: "get",
+      path,
+      tags: ["health"],
+      responses: {
+        200: S.jsonResponse(path === "/healthz" ? S.Ok : S.Ready, "healthy"),
+        ...(path === "/readyz" ? { 503: S.errorResponse("database unavailable") } : {}),
+      },
+    });
+  }
+  app.openAPIRegistry.registerPath({
+    method: "get",
+    path: "/ws",
+    tags: ["live"],
+    request: { query: S.WebSocketQuery },
+    responses: {
+      101: { description: "WebSocket upgrade; connect using a WebSocket client" },
+      401: unauthorized,
+      426: S.errorResponse("WebSocket upgrade required"),
+    },
+  });
+  for (const path of ["/docs", "/openapi.json"]) {
+    app.openAPIRegistry.registerPath({
+      method: "get",
+      path,
+      tags: ["documentation"],
+      responses: {
+        200: { description: path === "/docs" ? "Swagger UI HTML" : "OpenAPI JSON" },
+      },
+    });
+  }
   app.doc("/openapi.json", {
     openapi: "3.0.0",
     info: {
@@ -538,7 +592,18 @@ export function createApp(deps: AppDeps) {
   // ---- R5: one error shape for everything else -------------------------------------------------
   app.notFound((c) => c.json(errorBody(c, "not found"), 404));
   app.onError((err, c) => {
-    if (err instanceof HTTPException) return c.json(errorBody(c, err.message), err.status);
+    // Two concurrent registrations can pass the initial lookup. The unique constraint
+    // is authoritative; map that conflict to the same 409 as the early lookup.
+    let cause: unknown = err;
+    for (let depth = 0; depth < 8 && cause instanceof Error; depth++) {
+      if (/UNIQUE constraint failed: users\.email/.test(cause.message)) {
+        return c.json(errorBody(c, "email already registered"), 409);
+      }
+      cause = cause.cause;
+    }
+    if (err instanceof HTTPException) {
+      return c.json(errorBody(c, err.message), err.status);
+    }
     if (err instanceof PoolTimeoutError) {
       c.header("Retry-After", "1");
       return c.json(errorBody(c, "database busy, try again"), 503);

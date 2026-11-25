@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 3: print the SQL that the naive and the good versions send.
 //   deno task n+1
 import type { Logger } from "drizzle-orm";
@@ -17,7 +17,11 @@ class PrintLogger implements Logger {
   logQuery(query: string, params: unknown[]): void {
     if (this.quiet) return;
     this.count++;
-    console.log(`  [${this.count}] ${query}${params.length ? `  -- ${JSON.stringify(params)}` : ""}`);
+    console.log(
+      `  [${this.count}] ${query}${
+        params.length ? `  -- ${JSON.stringify(params)}` : ""
+      }`,
+    );
   }
 }
 

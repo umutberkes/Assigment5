@@ -15,7 +15,9 @@
     "db:generate": "deno run -A npm:drizzle-kit@^0.31 generate",
     "db:migrate": "deno run -A npm:drizzle-kit@^0.31 migrate",
     "ui:install": "cd ui && deno install",
-    "ui:dev": "cd ui && deno task dev"
+    "ui:dev": "cd ui && deno task dev",
+    "admin": "deno run -A --env-file=.env scripts/admin.ts",
+    "evidence:live": "deno run -A --unstable-kv scripts/verify_live.ts"
   },
   "imports": {
     "hono": "npm:hono@^4",
@@ -35,9 +37,15 @@
   },
   "fmt": {
     "lineWidth": 90,
-    "exclude": ["ui/", "drizzle/"]
+    "exclude": [
+      "ui/",
+      "drizzle/",
+      "evidence/"
+    ]
   },
   "lint": {
-    "exclude": ["ui/"]
+    "exclude": [
+      "ui/"
+    ]
   }
 }

@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 14: the purge job, tested as a plain function.
 import { assertEquals } from "@std/assert";
 import { createDb, migrate } from "../src/db.ts";
@@ -24,7 +24,9 @@ Deno.test("purgeOldDone removes only done tasks completed 30+ days ago, and is i
   const second = await purgeOldDone(db, 30, { now: NOW });
   assertEquals([first, second], [2, 0]);
 
-  const left = (await db.db.select({ title: tasks.title }).from(tasks)).map((t) => t.title);
+  const left = (await db.db.select({ title: tasks.title }).from(tasks)).map((t) =>
+    t.title
+  );
   assertEquals(left.sort(), ["old but not done", "old, reopened", "recent done"]);
 });
 
@@ -36,7 +38,13 @@ Deno.test("purgeOldDone also removes the attachment files of the purged tasks", 
   await Deno.writeTextFile(`${dir}/keep.png`, "x");
   await db.db.insert(users).values({ email: "a@example.com", passwordHash: "x" });
   await db.db.insert(tasks).values([
-    { userId: 1, title: "old", status: "done", completedAt: NOW - 40 * DAY_SECONDS, attachment: "old.png" },
+    {
+      userId: 1,
+      title: "old",
+      status: "done",
+      completedAt: NOW - 40 * DAY_SECONDS,
+      attachment: "old.png",
+    },
     { userId: 1, title: "new", status: "done", completedAt: NOW, attachment: "keep.png" },
   ]);
   assertEquals(await purgeOldDone(db, 30, { now: NOW, uploadDir: dir }), 1);

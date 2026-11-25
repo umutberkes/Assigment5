@@ -1,5 +1,5 @@
 #!/bin/sh
-# STUDENT NAME, STUDENT NUMBER
+# Umut Berke Şenyayla, 2000002240
 # R8: run one curl command per route against a running API and print the commands with their
 # real output as Markdown, ready to paste into README.md.
 #   deno task dev            (first terminal; start from an empty tasks.db)

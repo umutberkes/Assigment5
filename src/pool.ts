@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 6, option B: a connection pool of my own, used with SQLite.
 
 export class PoolTimeoutError extends Error {
@@ -13,7 +13,7 @@ export class PoolTimeoutError extends Error {
 export class Pool<T> {
   #all: T[];
   #idle: T[];
-  #waiting: { resolve: (item: T) => void; timer?: number }[] = [];
+  #waiting: { resolve: (item: T) => void; timer?: ReturnType<typeof setTimeout> }[] = [];
   #acquireTimeoutMs: number;
 
   constructor(items: T[], options: { acquireTimeoutMs?: number } = {}) {
@@ -37,10 +37,15 @@ export class Pool<T> {
     const item = this.#idle.pop();
     if (item !== undefined) return Promise.resolve(item);
     return new Promise<T>((resolve, reject) => {
-      const waiter: { resolve: (item: T) => void; timer?: number } = { resolve };
+      const waiter: {
+        resolve: (item: T) => void;
+        timer?: ReturnType<typeof setTimeout>;
+      } = { resolve };
       waiter.timer = setTimeout(() => {
         this.#waiting = this.#waiting.filter((w) => w !== waiter);
-        reject(new PoolTimeoutError(`no free connection after ${this.#acquireTimeoutMs} ms`));
+        reject(
+          new PoolTimeoutError(`no free connection after ${this.#acquireTimeoutMs} ms`),
+        );
       }, this.#acquireTimeoutMs);
       this.#waiting.push(waiter);
     });

@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 8: /openapi.json and the docs page.
 import { assert, assertEquals, assertStringIncludes } from "@std/assert";
 import { freshApp } from "./helpers.ts";
@@ -12,28 +12,38 @@ Deno.test("/openapi.json lists every route with its error responses and the Bear
   const routes = Object.entries(doc.paths as Record<string, Record<string, unknown>>)
     .flatMap(([path, ops]) => Object.keys(ops).map((m) => `${m.toUpperCase()} ${path}`))
     .sort();
-  assertEquals(routes, [
-    "DELETE /api/tasks/{id}",
-    "GET /api/admin/users",
-    "GET /api/me/summary",
-    "GET /api/tasks",
-    "GET /api/tasks/{id}",
-    "GET /api/tasks/{id}/attachment",
-    "GET /health",
-    "POST /api/tasks",
-    "POST /api/tasks/{id}/attachment",
-    "POST /api/tasks/{id}/restore",
-    "POST /auth/login",
-    "POST /auth/register",
-    "PUT /api/tasks/{id}",
-  ]);
+  assertEquals(
+    routes,
+    [
+      "DELETE /api/tasks/{id}",
+      "GET /api/admin/users",
+      "GET /api/me/summary",
+      "GET /api/tasks",
+      "GET /api/tasks/{id}",
+      "GET /api/tasks/{id}/attachment",
+      "GET /health",
+      "GET /healthz",
+      "GET /readyz",
+      "GET /ws",
+      "GET /docs",
+      "GET /openapi.json",
+      "POST /api/tasks",
+      "POST /api/tasks/{id}/attachment",
+      "POST /api/tasks/{id}/restore",
+      "POST /auth/login",
+      "POST /auth/register",
+      "PUT /api/tasks/{id}",
+    ].sort(),
+  );
   assertEquals(doc.components.securitySchemes.Bearer, {
     type: "http",
     scheme: "bearer",
     bearerFormat: "opaque session token",
   });
   // every protected route asks for the token and documents 401; the id routes document 404
-  for (const [path, ops] of Object.entries(doc.paths as Record<string, Record<string, Op>>)) {
+  for (
+    const [path, ops] of Object.entries(doc.paths as Record<string, Record<string, Op>>)
+  ) {
     for (const op of Object.values(ops)) {
       if (!path.startsWith("/api/")) continue;
       assertEquals(op.security, [{ Bearer: [] }], path);

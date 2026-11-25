@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 13: WebSocket live updates.
 import { assertEquals } from "@std/assert";
 import { LiveHub, type LiveSocket } from "../src/live.ts";
@@ -29,7 +29,9 @@ async function liveApp() {
     },
   });
   const openTab = async (token: string) => {
-    const res = await app.request(`/ws?token=${token}`, { headers: { upgrade: "websocket" } });
+    const res = await app.request(`/ws?token=${token}`, {
+      headers: { upgrade: "websocket" },
+    });
     assertEquals(res.status, 200);
     const socket = sockets.at(-1)!;
     socket.onopen?.();
@@ -61,7 +63,13 @@ Deno.test("a change in one tab reaches my other tab, and never another user's", 
   const bobTab = await openTab(bob);
 
   const task = await makeTask(app, alice, { title: "Live!" });
-  await send(app, "PUT", `/api/tasks/${task.id}`, { title: "Live!", status: "done" }, alice);
+  await send(
+    app,
+    "PUT",
+    `/api/tasks/${task.id}`,
+    { title: "Live!", status: "done" },
+    alice,
+  );
   await send(app, "DELETE", `/api/tasks/${task.id}`, undefined, alice);
 
   assertEquals(aliceTab.sent.map((e) => e.type), ["created", "updated", "deleted"]);

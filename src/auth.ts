@@ -1,10 +1,10 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 import bcrypt from "bcryptjs";
 import { jwtVerify, SignJWT } from "jose";
 import { and, eq, gt, sql } from "drizzle-orm";
 import type { MiddlewareHandler } from "hono";
 import type { Db } from "./db.ts";
-import { ROLES, type Role, sessions, users } from "./schema.ts";
+import { type Role, ROLES, sessions, users } from "./schema.ts";
 
 export const hashPassword = (plain: string) => bcrypt.hash(plain, 10);
 export const checkPassword = (plain: string, hash: string) => bcrypt.compare(plain, hash);
@@ -51,7 +51,9 @@ export const sessionTokens = (): TokenService => ({
   async verify(db, token) {
     const [row] = await db.db.select({ userId: users.id, role: users.role })
       .from(sessions).innerJoin(users, eq(users.id, sessions.userId))
-      .where(and(eq(sessions.token, token), gt(sessions.expiresAt, sql`strftime('%s','now')`)));
+      .where(
+        and(eq(sessions.token, token), gt(sessions.expiresAt, sql`strftime('%s','now')`)),
+      );
     return row ?? null;
   },
 });
@@ -66,7 +68,11 @@ export function jwtTokens(secret: string, expiresIn = "1h"): TokenService {
   };
 }
 
-export function signToken(key: Uint8Array, who: Identity, expiresIn = "1h"): Promise<string> {
+export function signToken(
+  key: Uint8Array,
+  who: Identity,
+  expiresIn = "1h",
+): Promise<string> {
   return new SignJWT({ role: who.role })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(String(who.userId))
@@ -75,7 +81,10 @@ export function signToken(key: Uint8Array, who: Identity, expiresIn = "1h"): Pro
     .sign(key);
 }
 
-export async function verifyToken(key: Uint8Array, token: string): Promise<Identity | null> {
+export async function verifyToken(
+  key: Uint8Array,
+  token: string,
+): Promise<Identity | null> {
   try {
     const { payload } = await jwtVerify(token, key, { algorithms: ["HS256"] });
     const userId = Number(payload.sub);
@@ -99,8 +108,11 @@ export function bearerToken(header: string | undefined): string {
   return match?.[1] ?? "";
 }
 
-type Fail = (c: Parameters<MiddlewareHandler<Env>>[0], status: 401 | 403, error: string) =>
-  Response;
+type Fail = (
+  c: Parameters<MiddlewareHandler<Env>>[0],
+  status: 401 | 403,
+  error: string,
+) => Response;
 
 /**
  * R3: stop with 401 unless the request carries a valid token. On success the user id and

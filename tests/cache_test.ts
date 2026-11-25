@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 16: a cache with Deno KV (the test task runs with --unstable-kv).
 import { assertEquals } from "@std/assert";
 import { TaskCache } from "../src/cache.ts";
@@ -31,7 +31,8 @@ Deno.test("a changed task is not served stale (PUT and DELETE clear the entry)",
     const task = await makeTask(app, token, { title: "before" });
     await send(app, "GET", `/api/tasks/${task.id}`, undefined, token); // now cached
     await send(app, "PUT", `/api/tasks/${task.id}`, { title: "after" }, token);
-    const got = await (await send(app, "GET", `/api/tasks/${task.id}`, undefined, token)).json();
+    const got = await (await send(app, "GET", `/api/tasks/${task.id}`, undefined, token))
+      .json();
     assertEquals(got.title, "after");
 
     await send(app, "DELETE", `/api/tasks/${task.id}`, undefined, token);

@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 4 and Bonus 5: the index is used, and the seed script is safe to run twice.
 import { assertEquals, assertStringIncludes } from "@std/assert";
 import { count, eq } from "drizzle-orm";
@@ -29,7 +29,9 @@ Deno.test("seed fills an empty database, and a second run creates nothing", asyn
   assertEquals(second, { users: 0, tasks: 0 });
   const [n] = await db.db.select({ n: count() }).from(tasks);
   assertEquals(n?.n, 18);
-  const [admin] = await db.db.select().from(users).where(eq(users.email, "admin@example.com"));
+  const [admin] = await db.db.select().from(users).where(
+    eq(users.email, "admin@example.com"),
+  );
   assertEquals(admin?.role, "admin");
 });
 

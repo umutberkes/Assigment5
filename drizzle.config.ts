@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 1: Drizzle Kit reads schema.ts and writes SQL migration files to ./drizzle.
 import { defineConfig } from "drizzle-kit";
 

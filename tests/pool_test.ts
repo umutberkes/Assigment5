@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 6, option B: my own pool.
 import { assertEquals, assertRejects } from "@std/assert";
 import { Pool, PoolTimeoutError } from "../src/pool.ts";
@@ -60,10 +60,15 @@ Deno.test("a pool of real connections: concurrent writes all land, WAL is on", a
   const file = await Deno.makeTempFile({ suffix: ".db" });
   const pool = await createDbPool(`file:${file}`, 3);
   await pool.use((db) => migrate(db));
-  await Promise.all(Array.from({ length: 30 }, (_, i) =>
-    pool.use((db) =>
-      db.db.insert(users).values({ email: `user${i}@example.com`, passwordHash: "x" })
-    )));
+  await Promise.all(
+    Array.from(
+      { length: 30 },
+      (_, i) =>
+        pool.use((db) =>
+          db.db.insert(users).values({ email: `user${i}@example.com`, passwordHash: "x" })
+        ),
+    ),
+  );
   const rows = await pool.use((db) => db.db.select().from(users));
   assertEquals(rows.length, 30);
   const mode = await pool.use((db) => db.client.execute("PRAGMA journal_mode"));

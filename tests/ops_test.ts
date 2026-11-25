@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 11: health, readiness and configuration.
 import { assertEquals, assertStringIncludes, assertThrows } from "@std/assert";
 import { ConfigError, loadConfig } from "../src/config.ts";
@@ -15,7 +15,10 @@ Deno.test("GET /healthz is 200 and GET /readyz is 200 when the database answers"
 });
 
 Deno.test("GET /readyz is 503 when the database does not answer", async () => {
-  const pool = await createDbPool(`file:${await Deno.makeTempFile({ suffix: ".db" })}`, 1);
+  const pool = await createDbPool(
+    `file:${await Deno.makeTempFile({ suffix: ".db" })}`,
+    1,
+  );
   for (const db of pool.items()) db.client.close(); // the database "goes away"
   const app = createApp({ pool, config: testConfig(), log: null });
   const original = console.error;
@@ -44,7 +47,8 @@ Deno.test("config: defaults for development", () => {
 
 Deno.test("config: a bad value stops start-up with a clear message", () => {
   const err = assertThrows(
-    () => loadConfig({ PORT: "eighty", DATABASE_URL: "postgres://x", AUTH_MODE: "magic" }),
+    () =>
+      loadConfig({ PORT: "eighty", DATABASE_URL: "postgres://x", AUTH_MODE: "magic" }),
     ConfigError,
   ) as ConfigError;
   assertStringIncludes(err.message, "PORT");

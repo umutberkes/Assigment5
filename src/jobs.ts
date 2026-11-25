@@ -1,7 +1,8 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 14: delete tasks that were done more than `days` days ago.
 import { and, eq, isNotNull, lte } from "drizzle-orm";
 import type { Db } from "./db.ts";
+import type { TaskCache } from "./cache.ts";
 import { tasks } from "./schema.ts";
 
 export const DAY_SECONDS = 24 * 60 * 60;
@@ -14,7 +15,7 @@ export const DAY_SECONDS = 24 * 60 * 60;
 export async function purgeOldDone(
   db: Db,
   days: number,
-  options: { now?: number; uploadDir?: string } = {},
+  options: { now?: number; uploadDir?: string; cache?: TaskCache } = {},
 ): Promise<number> {
   const now = options.now ?? Math.floor(Date.now() / 1000);
   const cutoff = now - days * DAY_SECONDS;
@@ -24,7 +25,8 @@ export async function purgeOldDone(
       isNotNull(tasks.completedAt),
       lte(tasks.completedAt, cutoff),
     ))
-    .returning({ id: tasks.id, attachment: tasks.attachment });
+    .returning({ id: tasks.id, userId: tasks.userId, attachment: tasks.attachment });
+  for (const task of removed) await options.cache?.drop(task.userId, task.id);
   if (options.uploadDir) {
     for (const { attachment } of removed) {
       if (!attachment) continue;

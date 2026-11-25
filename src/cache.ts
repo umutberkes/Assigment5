@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 16: cache single tasks in Deno KV for 60 seconds.
 import type { Task } from "./schema.ts";
 
@@ -21,6 +21,8 @@ export class TaskCache {
     load: () => Promise<Task | undefined>,
   ): Promise<Task | undefined> {
     const key = TaskCache.key(userId, id);
+    const revisionKey: Deno.KvKey = ["task-revision", userId, id];
+    const revision = await this.kv.get<string>(revisionKey);
     const hit = await this.kv.get<Task>(key);
     if (hit.value) {
       this.hits++;
@@ -28,12 +30,17 @@ export class TaskCache {
     }
     this.misses++;
     const row = await load();
-    if (row) await this.kv.set(key, row, { expireIn: this.ttlMs });
+    if (row) {
+      // Do not repopulate a stale value if a mutation invalidated this key during load().
+      await this.kv.atomic().check(revision)
+        .set(key, row, { expireIn: this.ttlMs }).commit();
+    }
     return row;
   }
 
   /** Call after every change to the task. */
   async drop(userId: number, id: number): Promise<void> {
-    await this.kv.delete(TaskCache.key(userId, id));
+    await this.kv.atomic().delete(TaskCache.key(userId, id))
+      .set(["task-revision", userId, id], crypto.randomUUID()).commit();
   }
 }

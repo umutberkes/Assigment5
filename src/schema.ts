@@ -1,4 +1,4 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 import { check, index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
@@ -32,10 +32,13 @@ export const tasks = sqliteTable(
   "tasks",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    userId: integer("user_id").notNull().references(() => users.id, {
+      onDelete: "cascade",
+    }),
     title: text("title").notNull(),
     // my own fields: free text notes and an optional due date (YYYY-MM-DD)
     notes: text("notes"),
+    estimateMinutes: integer("estimate_minutes"),
     dueDate: text("due_date"),
     status: text("status", { enum: STATUSES }).notNull().default("todo"),
     priority: text("priority", { enum: PRIORITIES }).notNull().default("medium"),

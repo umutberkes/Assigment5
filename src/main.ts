@@ -1,7 +1,12 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 import { createApp } from "./app.ts";
 import { ConfigError, loadConfig } from "./config.ts";
-import { createDbPool, hasGeneratedMigrations, migrate, migrateFromFolder } from "./db.ts";
+import {
+  createDbPool,
+  hasGeneratedMigrations,
+  migrate,
+  migrateFromFolder,
+} from "./db.ts";
 import { TaskCache } from "./cache.ts";
 import { purgeOldDone } from "./jobs.ts";
 
@@ -26,12 +31,13 @@ console.log(JSON.stringify({ migrations: fromFolder ? "drizzle/" : "migrate()" }
 
 // Bonus 16: Deno KV for the task cache (needs --unstable-kv when run locally)
 const kv = await Deno.openKv();
-const app = createApp({ pool, config, cache: new TaskCache(kv) });
+const cache = new TaskCache(kv);
+const app = createApp({ pool, config, cache });
 
 // Bonus 14: every night at 03:00 UTC remove tasks that were done more than 30 days ago
-Deno.cron("purge old done tasks", "0 3 * * *", async () => {
+Deno.cron("purge old done tasks", config.CRON_SCHEDULE, async () => {
   const removed = await pool.use((db) =>
-    purgeOldDone(db, 30, { uploadDir: config.UPLOAD_DIR })
+    purgeOldDone(db, 30, { uploadDir: config.UPLOAD_DIR, cache })
   );
   console.log(JSON.stringify({ time: new Date().toISOString(), job: "purge", removed }));
 });

@@ -1,11 +1,18 @@
-// STUDENT NAME, STUDENT NUMBER
+// Umut Berke Şenyayla, 2000002240
 // Bonus 5: fill a database with demo users and tasks. Safe to run twice.
 //   deno task seed
 import { count, eq } from "drizzle-orm";
 import { hashPassword } from "../src/auth.ts";
 import { loadConfig } from "../src/config.ts";
-import { createDb, type Db, migrate } from "../src/db.ts";
-import { type NewTask, type Priority, type Role, type Status, tasks, users } from "../src/schema.ts";
+import { createDb, type Db, migrateDatabase } from "../src/db.ts";
+import {
+  type NewTask,
+  type Priority,
+  type Role,
+  type Status,
+  tasks,
+  users,
+} from "../src/schema.ts";
 
 export const DEMO_PASSWORD = "demo-password-2026";
 
@@ -41,7 +48,10 @@ const BOB: Row[] = [
   ["Plan the Bozcaada trip", "todo", "medium", "2027-05-01"],
 ];
 
-const TASKS: Record<string, Row[]> = { "alice@example.com": ALICE, "bob@example.com": BOB };
+const TASKS: Record<string, Row[]> = {
+  "alice@example.com": ALICE,
+  "bob@example.com": BOB,
+};
 
 /** Returns what was created; a second run creates nothing. */
 export async function seed(db: Db): Promise<{ users: number; tasks: number }> {
@@ -53,9 +63,13 @@ export async function seed(db: Db): Promise<{ users: number; tasks: number }> {
 
   let createdTasks = 0;
   for (const [email, rows] of Object.entries(TASKS)) {
-    const [user] = await db.db.select({ id: users.id }).from(users).where(eq(users.email, email));
+    const [user] = await db.db.select({ id: users.id }).from(users).where(
+      eq(users.email, email),
+    );
     if (!user) continue;
-    const [has] = await db.db.select({ n: count() }).from(tasks).where(eq(tasks.userId, user.id));
+    const [has] = await db.db.select({ n: count() }).from(tasks).where(
+      eq(tasks.userId, user.id),
+    );
     if ((has?.n ?? 0) > 0) continue; // this user already has tasks: leave them alone
     const now = Math.floor(Date.now() / 1000);
     const values: NewTask[] = rows.map(([title, status, priority, dueDate], i) => ({
@@ -80,7 +94,7 @@ if (import.meta.main) {
     Deno.exit(1);
   }
   const db = createDb(config.DATABASE_URL, { authToken: config.DATABASE_AUTH_TOKEN });
-  await migrate(db);
+  await migrateDatabase(db);
   const created = await seed(db);
   console.log(
     `seed: ${created.users} users and ${created.tasks} tasks created in ${config.DATABASE_URL}`,
