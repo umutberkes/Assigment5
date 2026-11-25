@@ -47,6 +47,11 @@ export type AppDeps = {
 
 const now = () => Math.floor(Date.now() / 1000);
 
+// A real bcrypt hash of a random string. Login compares against it when the email is
+// unknown, so a wrong email takes as long as a wrong password (no timing difference).
+let dummyHash: Promise<string> | null = null;
+const dummy = () => (dummyHash ??= hashPassword(crypto.randomUUID()));
+
 /** Build the whole application around its dependencies, so tests can give it their own. */
 export function createApp(deps: AppDeps) {
   const { pool, config } = deps;
@@ -176,8 +181,9 @@ export function createApp(deps: AppDeps) {
       }
       const db = c.get("db");
       const [user] = await db.db.select().from(users).where(eq(users.email, email));
-      // the same answer for "no such email" and "wrong password"
-      if (!user || !(await checkPassword(password, user.passwordHash))) {
+      // the same answer, and the same time, for "no such email" and "wrong password"
+      const ok = await checkPassword(password, user?.passwordHash ?? await dummy());
+      if (!user || !ok) {
         limiter.recordFailure(email);
         return c.json(errorBody(c, "wrong email or password"), 401);
       }

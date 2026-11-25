@@ -93,3 +93,18 @@ Deno.test("a missing, malformed or unknown token is 401 with the error shape", a
     assertEquals((await res.json()).error, "unauthorized");
   }
 });
+
+Deno.test("an unknown email takes about as long as a wrong password (no timing leak)", async () => {
+  const app = await freshApp();
+  await send(app, "POST", "/auth/register", alice);
+  await send(app, "POST", "/auth/login", { email: "warm@example.com", password: "x".repeat(8) });
+  const time = async (email: string) => {
+    const start = performance.now();
+    await send(app, "POST", "/auth/login", { email, password: "wrong-password" });
+    return performance.now() - start;
+  };
+  const known = await time(alice.email);
+  const unknown = await time("nobody@example.com");
+  // both run one bcrypt compare (tens of ms); without the dummy hash, unknown took ~2 ms
+  assert(unknown > known / 3, `known ${known.toFixed(1)} ms, unknown ${unknown.toFixed(1)} ms`);
+});
