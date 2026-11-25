@@ -18,6 +18,19 @@ export const TaskBody = z.object({
   dueDate: z.iso.date().nullable().default(null).openapi({ example: "2026-12-01" }),
 }).openapi("TaskBody");
 
+/**
+ * PUT has the same fields as POST, but a field that is left out keeps its current value
+ * instead of falling back to the default. (The given UI sends only title and status when it
+ * advances a task; with plain defaults that reset every task's priority to "medium".)
+ */
+export const TaskUpdate = z.object({
+  title: TaskBody.shape.title,
+  status: z.enum(STATUSES).optional(),
+  priority: z.enum(PRIORITIES).optional(),
+  notes: z.string().max(2000).nullable().optional(),
+  dueDate: z.iso.date().nullable().optional(),
+}).openapi("TaskUpdate");
+
 export const ListQuery = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),

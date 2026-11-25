@@ -276,7 +276,7 @@ export function createApp(deps: AppDeps) {
       path: "/api/tasks/{id}",
       tags: ["tasks"],
       ...authed,
-      request: { params: S.IdParams, body: S.jsonBody(S.TaskBody) },
+      request: { params: S.IdParams, body: S.jsonBody(S.TaskUpdate) },
       responses: {
         200: S.jsonResponse(S.Task, "the updated task"),
         400: badRequest,
@@ -291,14 +291,23 @@ export function createApp(deps: AppDeps) {
       const db = c.get("db");
       const old = await findOwn(db, id, userId);
       if (!old) return c.json(errorBody(c, "task not found"), 404);
+      const status = body.status ?? old.status;
       // keep the first completion time while a task stays done (Bonus 14 uses it)
-      const completedAt = body.status !== "done"
+      const completedAt = status !== "done"
         ? null
         : old.status === "done"
         ? old.completedAt
         : now();
       const [task] = await db.db.update(tasks)
-        .set({ ...body, completedAt, updatedAt: now() })
+        .set({
+          title: body.title,
+          status,
+          priority: body.priority ?? old.priority,
+          notes: body.notes === undefined ? old.notes : body.notes,
+          dueDate: body.dueDate === undefined ? old.dueDate : body.dueDate,
+          completedAt,
+          updatedAt: now(),
+        })
         .where(own(id, userId)).returning();
       if (!task) return c.json(errorBody(c, "task not found"), 404);
       await changed(userId, "updated", task);

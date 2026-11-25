@@ -47,6 +47,34 @@ Deno.test("read, update and delete my own task", async () => {
   assertEquals(gone.status, 404);
 });
 
+Deno.test("PUT keeps the fields it was not given (as the given UI sends only title and status)", async () => {
+  const app = await freshApp();
+  const token = await loginAs(app, "alice@example.com");
+  const task = await makeTask(app, token, {
+    title: "Exam",
+    priority: "high",
+    notes: "room B204",
+    dueDate: "2027-01-12",
+  });
+  const res = await send(app, "PUT", `/api/tasks/${task.id}`, {
+    title: "Exam",
+    status: "in-progress",
+  }, token);
+  const t = await res.json();
+  assertEquals([t.status, t.priority, t.notes, t.dueDate], [
+    "in-progress",
+    "high",
+    "room B204",
+    "2027-01-12",
+  ]);
+  // null clears a field on purpose
+  const cleared = await (await send(app, "PUT", `/api/tasks/${task.id}`, {
+    title: "Exam",
+    notes: null,
+  }, token)).json();
+  assertEquals([cleared.notes, cleared.status], [null, "in-progress"]);
+});
+
 Deno.test("user B cannot read, change or delete user A's task (404 each)", async () => {
   const app = await freshApp();
   const a = await loginAs(app, "alice@example.com");
