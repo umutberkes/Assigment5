@@ -76,8 +76,9 @@ export const CREATE_TABLES = [
      CONSTRAINT tasks_status CHECK (status IN ('todo', 'in-progress', 'done')),
      CONSTRAINT tasks_priority CHECK (priority IN ('low', 'medium', 'high'))
    )`,
-  // Bonus 4: the list query filters by owner and status
-  `CREATE INDEX IF NOT EXISTS idx_tasks_user_status ON tasks (user_id, status)`,
+  // Bonus 4: the list query filters by owner and status and sorts by created_at
+  `CREATE INDEX IF NOT EXISTS idx_tasks_user_status_created
+     ON tasks (user_id, status, created_at)`,
 ];
 
 /** Create the tables if they do not exist yet. */

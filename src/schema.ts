@@ -53,7 +53,8 @@ export const tasks = sqliteTable(
     check("tasks_title_length", sql`length(${t.title}) BETWEEN 1 AND 100`),
     check("tasks_status", sql`${t.status} IN ('todo', 'in-progress', 'done')`),
     check("tasks_priority", sql`${t.priority} IN ('low', 'medium', 'high')`),
-    index("idx_tasks_user_status").on(t.userId, t.status),
+    // Bonus 4: owner + status for the filter, created_at so the newest-first order needs no sort
+    index("idx_tasks_user_status_created").on(t.userId, t.status, t.createdAt),
   ],
 );
 
