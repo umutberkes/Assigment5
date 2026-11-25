@@ -1,7 +1,7 @@
 // STUDENT NAME, STUDENT NUMBER
 import { createApp } from "./app.ts";
 import { ConfigError, loadConfig } from "./config.ts";
-import { createDbPool, migrate } from "./db.ts";
+import { createDbPool, hasGeneratedMigrations, migrate, migrateFromFolder } from "./db.ts";
 import { TaskCache } from "./cache.ts";
 import { purgeOldDone } from "./jobs.ts";
 
@@ -19,7 +19,10 @@ try {
 const pool = await createDbPool(config.DATABASE_URL, config.DB_POOL_SIZE, {
   authToken: config.DATABASE_AUTH_TOKEN,
 });
-await pool.use((db) => migrate(db));
+// Bonus 1: the generated migrations when they exist, otherwise the hand-written SQL
+const fromFolder = await hasGeneratedMigrations();
+await pool.use((db) => (fromFolder ? migrateFromFolder(db) : migrate(db)));
+console.log(JSON.stringify({ migrations: fromFolder ? "drizzle/" : "migrate()" }));
 
 // Bonus 16: Deno KV for the task cache (needs --unstable-kv when run locally)
 const kv = await Deno.openKv();

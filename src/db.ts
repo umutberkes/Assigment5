@@ -1,5 +1,6 @@
 // STUDENT NAME, STUDENT NUMBER
 import { drizzle } from "drizzle-orm/libsql";
+import { migrate as drizzleMigrate } from "drizzle-orm/libsql/migrator";
 import { createClient } from "@libsql/client";
 import type { Logger } from "drizzle-orm";
 import * as schema from "./schema.ts";
@@ -84,4 +85,21 @@ export const CREATE_TABLES = [
 /** Create the tables if they do not exist yet. */
 export async function migrate({ client }: Db) {
   await client.batch(CREATE_TABLES);
+}
+
+/**
+ * Bonus 1: apply the SQL files that Drizzle Kit generated from schema.ts
+ * (deno task db:generate). Drizzle keeps track of what already ran in __drizzle_migrations.
+ */
+export async function migrateFromFolder({ db }: Db, migrationsFolder = "./drizzle") {
+  await drizzleMigrate(db, { migrationsFolder });
+}
+
+/** True when generated migrations exist; then main.ts uses them instead of CREATE_TABLES. */
+export async function hasGeneratedMigrations(folder = "./drizzle"): Promise<boolean> {
+  try {
+    return (await Deno.stat(`${folder}/meta/_journal.json`)).isFile;
+  } catch {
+    return false;
+  }
 }
