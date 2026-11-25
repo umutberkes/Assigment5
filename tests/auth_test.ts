@@ -10,6 +10,7 @@ Deno.test("register answers 201 with id and email, never the hash", async () => 
   assertEquals(res.status, 201);
   const body = await res.json();
   assertEquals(body.email, alice.email);
+  assertEquals(body.role, "user");
   assertExists(body.id);
   assertEquals(body.passwordHash, undefined);
   assertEquals(body.password, undefined);
@@ -34,6 +35,17 @@ Deno.test("register with a bad body is 400 with the error shape", async () => {
   assertEquals(body.error, "validation failed");
   const paths = body.issues.map((i: { path: string[] }) => i.path[0]).sort();
   assertEquals(paths, ["email", "password"]);
+});
+
+Deno.test("broken JSON is 400 in the same shape", async () => {
+  const app = await freshApp();
+  const res = await app.request("/auth/login", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: '{"email": "alice@example.com",',
+  });
+  assertEquals(res.status, 400);
+  assertEquals((await res.json()).error, "Malformed JSON in request body");
 });
 
 Deno.test("register with no body at all is 400, not a crash", async () => {
@@ -65,7 +77,10 @@ Deno.test("login with a wrong password and with an unknown email give the same 4
   });
   assertEquals(wrongPassword.status, 401);
   assertEquals(unknownEmail.status, 401);
-  assertEquals(await wrongPassword.json(), await unknownEmail.json());
+  const a = await wrongPassword.json();
+  const b = await unknownEmail.json();
+  assertEquals(a.error, "wrong email or password");
+  assertEquals(a.error, b.error);
 });
 
 Deno.test("a missing, malformed or unknown token is 401 with the error shape", async () => {

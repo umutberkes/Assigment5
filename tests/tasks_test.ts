@@ -1,6 +1,6 @@
 // STUDENT NAME, STUDENT NUMBER
-import { assertEquals, assertNotEquals } from "@std/assert";
-import { freshApp, loginAs, makeTask, send } from "./helpers.ts";
+import { assertEquals } from "@std/assert";
+import { freshApp, loginAs, makeTask, send, WELCOME_TASKS } from "./helpers.ts";
 
 Deno.test("create a task: 201 with defaults, then it is in the list", async () => {
   const app = await freshApp();
@@ -12,8 +12,8 @@ Deno.test("create a task: 201 with defaults, then it is in the list", async () =
   assertEquals(typeof task.createdAt, "number");
 
   const list = await (await send(app, "GET", "/api/tasks", undefined, token)).json();
-  assertEquals(list.total, 1);
-  assertEquals(list.items[0].id, task.id);
+  assertEquals(list.total, WELCOME_TASKS + 1);
+  assertEquals(list.items[0].id, task.id); // newest first
 });
 
 Deno.test("read, update and delete my own task", async () => {
@@ -40,6 +40,9 @@ Deno.test("read, update and delete my own task", async () => {
 
   const del = await send(app, "DELETE", `/api/tasks/${task.id}`, undefined, token);
   assertEquals([del.status, await del.json()], [200, { ok: true }]);
+  // deleted twice: the second time it no longer exists
+  const again = await send(app, "DELETE", `/api/tasks/${task.id}`, undefined, token);
+  assertEquals(again.status, 404);
   const gone = await send(app, "GET", `/api/tasks/${task.id}`, undefined, token);
   assertEquals(gone.status, 404);
 });
@@ -57,9 +60,10 @@ Deno.test("user B cannot read, change or delete user A's task (404 each)", async
     assertEquals(res.status, 404);
     assertEquals((await res.json()).error, "task not found");
   }
-  // and B's list does not show it
+  // and B's list does not show it (only B's own welcome task)
   const list = await (await send(app, "GET", "/api/tasks", undefined, b)).json();
-  assertEquals(list.total, 0);
+  assertEquals(list.total, WELCOME_TASKS);
+  assertEquals(list.items.some((t: { id: number }) => t.id === task.id), false);
   // the task is unchanged for A
   const mine = await (await send(app, "GET", `/api/tasks/${task.id}`, undefined, a)).json();
   assertEquals(mine.title, "Alice's secret");
@@ -100,17 +104,20 @@ Deno.test("pagination: 3 tasks, page 2 with limit=2 holds one item and total 3",
   const token = await loginAs(app, "alice@example.com");
   const made = [];
   for (const title of ["first", "second", "third"]) {
-    made.push(await makeTask(app, token, { title }));
+    made.push(await makeTask(app, token, { title, status: "in-progress" }));
   }
-  const p1 = await (await send(app, "GET", "/api/tasks?page=1&limit=2", undefined, token))
-    .json();
-  const p2 = await (await send(app, "GET", "/api/tasks?page=2&limit=2", undefined, token))
-    .json();
+  // the status filter leaves the welcome task out, so exactly my three tasks are counted
+  const url = (page: number) => `/api/tasks?status=in-progress&page=${page}&limit=2`;
+  const p1 = await (await send(app, "GET", url(1), undefined, token)).json();
+  const p2 = await (await send(app, "GET", url(2), undefined, token)).json();
   assertEquals([p1.items.length, p1.total], [2, 3]);
   assertEquals([p2.items.length, p2.page, p2.limit, p2.total], [1, 2, 2, 3]);
-  // newest first, and no task appears on both pages
+  // newest first: page 1 holds third and second, page 2 holds first
+  assertEquals(p1.items.map((t: { title: string }) => t.title), ["third", "second"]);
   assertEquals(p2.items[0].id, made[0]!.id);
-  assertNotEquals(p1.items.map((t: { id: number }) => t.id), p2.items[0].id);
+  // a page after the end is empty, not an error
+  const p3 = await (await send(app, "GET", url(3), undefined, token)).json();
+  assertEquals([p3.items.length, p3.total], [0, 3]);
 });
 
 Deno.test("filter by status, and the defaults page=1 limit=20", async () => {
@@ -136,5 +143,7 @@ Deno.test("an unknown route answers 404 in the same shape", async () => {
   const app = await freshApp();
   const res = await app.request("/no/such/route");
   assertEquals(res.status, 404);
-  assertEquals(await res.json(), { error: "not found" });
+  const body = await res.json();
+  assertEquals(body.error, "not found");
+  assertEquals(body.requestId, res.headers.get("x-request-id"));
 });

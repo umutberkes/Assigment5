@@ -6,15 +6,19 @@ export const STATUSES = ["todo", "in-progress", "done"] as const;
 export const PRIORITIES = ["low", "medium", "high"] as const;
 export type Status = (typeof STATUSES)[number];
 export type Priority = (typeof PRIORITIES)[number];
+export const ROLES = ["user", "admin"] as const;
+export type Role = (typeof ROLES)[number];
 
 // Worked example: the users table.
 export const users = sqliteTable("users", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
+  // Bonus 9: "user" or "admin"
+  role: text("role", { enum: ROLES }).notNull().default("user"),
   // A SQL default runs for every row. A JavaScript Date.now() here would run once.
   createdAt: integer("created_at").notNull().default(sql`(strftime('%s','now'))`),
-});
+}, (t) => [check("users_role", sql`${t.role} IN ('user', 'admin')`)]);
 
 // The sessions table is given: a login makes a row, a token finds it.
 export const sessions = sqliteTable("sessions", {
@@ -39,6 +43,11 @@ export const tasks = sqliteTable(
     updatedAt: integer("updated_at").notNull().default(sql`(strftime('%s','now'))`),
     // set when the status becomes "done", cleared when it leaves "done"
     completedAt: integer("completed_at"),
+    // Bonus 2: soft delete. NULL means "not deleted".
+    deletedAt: integer("deleted_at"),
+    // Bonus 12: the stored file name (a UUID, never the user's name) and its type
+    attachment: text("attachment"),
+    attachmentType: text("attachment_type"),
   },
   (t) => [
     check("tasks_title_length", sql`length(${t.title}) BETWEEN 1 AND 100`),
