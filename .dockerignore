@@ -1,0 +1,11 @@
+ui
+tests
+scripts
+*.db
+*.db-*
+.env
+.env.*
+uploads
+.git
+.github
+README.md
